@@ -12,4 +12,12 @@ public class Util {
 
     public static final Faker FAKER = Faker.instance();
 
+    public static void sleep(double seconds) {
+        try {
+            Thread.sleep((long) (1000 * seconds));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
