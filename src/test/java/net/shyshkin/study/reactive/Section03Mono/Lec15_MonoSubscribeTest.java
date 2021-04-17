@@ -1,5 +1,6 @@
 package net.shyshkin.study.reactive.Section03Mono;
 
+import net.shyshkin.study.reactive.courseutil.Util;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -28,11 +29,7 @@ public class Lec15_MonoSubscribeTest {
         Mono<String> mono = Mono.just("ball");
 
         //when
-        mono.subscribe(
-                item -> System.out.println("Item: " + item),
-                error -> System.out.println(error.getMessage()),
-                () -> System.out.println("on Complete")
-        );
+        mono.subscribe(Util.onNext, Util.onError, Util.onComplete);
 
         //then - item and complete output
     }
@@ -50,7 +47,7 @@ public class Lec15_MonoSubscribeTest {
 
             //when
             mono.subscribe(
-                    item -> System.out.println("Item: " + item)
+                    Util.onNext
             );
 
             //then - exception happens
@@ -67,7 +64,7 @@ public class Lec15_MonoSubscribeTest {
             //when
             Executable exec = () -> {
                 mono.subscribe(
-                        item -> System.out.println("Item: " + item)
+                        Util.onNext
                 );
             };
 
@@ -85,9 +82,9 @@ public class Lec15_MonoSubscribeTest {
 
             //when
             mono.subscribe(
-                    item -> System.out.println("Item: " + item),
-                    error -> System.out.println(error.getClass().getSimpleName() + ":" + error.getMessage()),
-                    () -> System.out.println("on Complete")
+                    Util.onNext,
+                    Util.onError,
+                    Util.onComplete
             );
 
             //then - item and complete output
