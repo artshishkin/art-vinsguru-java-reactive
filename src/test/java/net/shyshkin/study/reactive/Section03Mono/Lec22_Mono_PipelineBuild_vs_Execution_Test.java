@@ -1,6 +1,7 @@
 package net.shyshkin.study.reactive.Section03Mono;
 
 import net.shyshkin.study.reactive.courseutil.Util;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -44,6 +45,21 @@ public class Lec22_Mono_PipelineBuild_vs_Execution_Test {
         //then
         System.out.println("Subscriber method executes in different thread so it is not blocking");
         Util.sleep(1.2);
+    }
+
+    @Test
+    @DisplayName("block - just fir testing purposes")
+    void methodBlock() {
+
+        //when
+        getName();
+        String name = getName()
+                .subscribeOn(Schedulers.boundedElastic())
+                .block();
+        getName();
+
+        //then
+        System.out.println("name: " + name);
     }
 
     private Mono<String> getName() {
