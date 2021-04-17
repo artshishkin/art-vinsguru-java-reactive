@@ -1,14 +1,16 @@
 package net.shyshkin.study.reactive.courseutil;
 
 import com.github.javafaker.Faker;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.function.Consumer;
 
+@Slf4j
 public class Util {
 
-    public static final Consumer<Object> onNext = o -> System.out.println("Received: " + o);
-    public static final Consumer<Throwable> onError = ex -> System.out.printf("ERROR: %s:%s", ex.getClass().getSimpleName(), ex.getMessage());
-    public static final Runnable onComplete = () -> System.out.println("Completed");
+    public static final Consumer<Object> onNext = o -> log.debug("Received: {}", o);
+    public static final Consumer<Throwable> onError = ex -> log.error("ERROR: {}:{}", ex.getClass().getSimpleName(), ex.getMessage());
+    public static final Runnable onComplete = () -> log.debug("Completed");
 
     public static final Faker FAKER = Faker.instance();
 
