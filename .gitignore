@@ -33,3 +33,5 @@ build/
 .vscode/
 
 node_modules/
+/src/main/resources/assignment/Section03Mono/file_to_write.txt
+/src/main/resources/assignment/Section03Mono/file_to_delete.txt
