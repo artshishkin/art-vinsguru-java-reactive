@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
-public class Lec56_FluxGenerate_HowToHaveCounter_Test {
+public class Lec56_57_FluxGenerate_HowToHaveCounter_useWithState_Test {
 
     @Test
     void counter_badSolution() {
@@ -30,5 +30,23 @@ public class Lec56_FluxGenerate_HowToHaveCounter_Test {
         counter.incrementAndGet();
         log.debug("Counter is declared outside the SynchronousSink -> we can affect loop from outside");
 
+    }
+
+    @Test
+    void counter_correctSolution() {
+        //given
+
+        Flux.generate(
+                () -> 1,
+                (counter, synchronousSink) -> {
+                    String name = Util.FAKER.country().name();
+                    synchronousSink.next(name);
+                    log.debug("Emitting [{}][{}] {}", Thread.currentThread().getName(), counter, name);
+                    if ("canada".equals(name.toLowerCase()) || counter >= 10)
+                        synchronousSink.complete();
+                    return counter + 1;
+                })
+                //when - then
+                .subscribe(Util.subscriber());
     }
 }
