@@ -2,6 +2,7 @@ package net.shyshkin.study.reactive.courseutil;
 
 import com.github.javafaker.Faker;
 import lombok.extern.slf4j.Slf4j;
+import org.reactivestreams.Subscriber;
 
 import java.util.function.Consumer;
 
@@ -22,4 +23,11 @@ public class Util {
         }
     }
 
+    public static Subscriber<Object> subscriber() {
+        return new DefaultSubscriber();
+    }
+
+    public static Subscriber<Object> subscriber(String name) {
+        return new DefaultSubscriber(name);
+    }
 }
