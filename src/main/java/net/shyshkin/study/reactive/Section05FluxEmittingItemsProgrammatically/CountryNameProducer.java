@@ -16,7 +16,8 @@ public class CountryNameProducer implements Consumer<FluxSink<String>> {
 
     public void produce() {
         String countryName = Util.FAKER.country().name();
-        fluxSink.next(countryName);
+        String threadName = Thread.currentThread().getName();
+        fluxSink.next(threadName + " : " + countryName);
     }
 
     public void complete() {

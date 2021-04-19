@@ -22,4 +22,23 @@ public class Lec49_FluxCreateRefactor_Test {
 
         Thread.sleep(100);
     }
+
+    @Test
+    void differentThreads() {
+        //given
+        CountryNameProducer producer = new CountryNameProducer();
+
+        //when - then
+        Flux.create(producer)
+                .subscribe(Util.subscriber());
+
+        Runnable runnable = producer::produce;
+        for (int i = 0; i < 10; i++) {
+            new Thread(runnable).start();
+        }
+        Util.sleep(0.2);
+        producer.complete();
+
+        Util.sleep(0.1);
+    }
 }
