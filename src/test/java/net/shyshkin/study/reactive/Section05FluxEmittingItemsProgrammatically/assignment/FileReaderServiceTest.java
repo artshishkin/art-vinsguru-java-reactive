@@ -70,4 +70,29 @@ class FileReaderServiceTest {
                         () -> assertTrue(ex.getMessage().contains(path.toString()))
                 ));
     }
+
+    @Test
+    void read_error() {
+
+        //given
+        Path path = Path.of("src/main/resources/assignment/Section04FluxGenerate/many_lines.txt");
+
+        //when
+        Flux<String> flux = FileReaderService
+                .readFile(path)
+                .map(s -> {
+                    if (Util.FAKER.random().nextInt(1, 10) > 6)
+                        throw new RuntimeException("Fake Exception for Testing");
+                    return s;
+                });
+
+        //then
+        flux.subscribe(Util.subscriber());
+//        StepVerifier
+//                .create(flux)
+//                .verifyErrorSatisfies(ex -> assertAll(
+//                        () -> assertEquals(RuntimeException.class, ex.getClass()),
+//                        () -> assertEquals("Fake Exception for Testing", ex.getMessage())
+//                ));
+    }
 }
