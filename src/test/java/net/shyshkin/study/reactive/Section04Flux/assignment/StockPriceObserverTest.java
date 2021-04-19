@@ -9,10 +9,23 @@ import java.util.concurrent.CountDownLatch;
 class StockPriceObserverTest {
 
     @Test
-    void observe() throws InterruptedException {
+    void observeMy() throws InterruptedException {
         //given
         CountDownLatch countDownLatch = new CountDownLatch(1);
         Flux<Integer> flux = StockPricePublisher.getPrice();
+
+        //when - then
+        Subscriber<? super Integer> subscriber = new StockPriceObserver(countDownLatch);
+
+        flux.subscribe(subscriber);
+        countDownLatch.await();
+    }
+
+    @Test
+    void observeVinsguru() throws InterruptedException {
+        //given
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        Flux<Integer> flux = VinsguruStockPricePublisher.getPrice();
 
         //when - then
         Subscriber<? super Integer> subscriber = new StockPriceObserver(countDownLatch);
