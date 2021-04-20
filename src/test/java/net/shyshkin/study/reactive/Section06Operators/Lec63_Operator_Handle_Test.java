@@ -79,11 +79,40 @@ public class Lec63_Operator_Handle_Test {
         Flux.range(1, Integer.MAX_VALUE)
 
                 //when
-                .handle(((integer, synchronousSink) -> {
+                .handle((integer, synchronousSink) -> {
                     String countryName = Util.FAKER.country().name();
                     synchronousSink.next(countryName);
                     if ("Ukraine".equals(countryName)) synchronousSink.complete();
-                }))
+                })
+
+                //then
+                .subscribe(Util.subscriber());
+    }
+
+    @Test
+    void handle_Ukraine_Vinsguru() {
+        //given
+        Flux.generate(synchronousSink -> synchronousSink.next(Util.FAKER.country().name()))
+
+                //when
+                .map(Object::toString)
+                .handle((country, synchronousSink) -> {
+                    synchronousSink.next(country);
+                    if ("Ukraine".equals(country)) synchronousSink.complete();
+                })
+
+                //then
+                .subscribe(Util.subscriber());
+    }
+
+    @Test
+    void without_handle_Ukraine_Vinsguru_Art() {
+        //given
+        Flux.generate(synchronousSink -> synchronousSink.next(Util.FAKER.country().name()))
+
+                //when
+                .map(Object::toString)
+                .takeUntil("Ukraine"::equals)
 
                 //then
                 .subscribe(Util.subscriber());
