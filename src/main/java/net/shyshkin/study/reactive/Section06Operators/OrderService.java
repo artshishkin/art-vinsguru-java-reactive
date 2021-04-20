@@ -2,6 +2,7 @@ package net.shyshkin.study.reactive.Section06Operators;
 
 import reactor.core.publisher.Flux;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -31,6 +32,7 @@ public class OrderService {
     }
 
     public static Flux<PurchaseOrder> getOrders(int userId) {
-        return Flux.fromIterable(db.get(userId));
+        return Flux.fromIterable(db.get(userId))
+                .delayElements(Duration.ofMillis(100));
     }
 }
