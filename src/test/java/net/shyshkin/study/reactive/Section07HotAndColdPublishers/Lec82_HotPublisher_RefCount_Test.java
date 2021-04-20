@@ -91,4 +91,29 @@ public class Lec82_HotPublisher_RefCount_Test {
         return IntStream.rangeClosed(1, 7)
                 .mapToObj(i -> String.format("Scene %2d", i));
     }
+
+
+    @Test
+    @DisplayName("When shared flux is in completed state new subscription starts emitting data from beginning")
+    void hotPublisher_refCount_resubscribe() throws InterruptedException {
+        //given
+        log.debug("Start test");
+        // share = publish().refCount(1)
+        CountDownLatch latch = new CountDownLatch(2);
+        Flux<String> movieStream = Flux.fromStream(this::getMovie)
+                .delayElements(Duration.ofMillis(100))
+                .publish()
+                .refCount(1);
+
+        //when
+        Util.sleep(0.1);
+        movieStream
+                .subscribe(Util.subscriber("Sub1", latch));
+        Util.sleep(1);
+        movieStream
+                .subscribe(Util.subscriber("Sub2", latch));
+
+        //then
+        latch.await();
+    }
 }
