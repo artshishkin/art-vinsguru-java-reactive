@@ -6,14 +6,27 @@ import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
+import java.util.concurrent.CountDownLatch;
+
 @Slf4j
 @NoArgsConstructor
 public class DefaultSubscriber implements Subscriber<Object> {
 
     private String name = "";
+    private CountDownLatch latch;
 
     public DefaultSubscriber(String name) {
-        this.name = name + " - ";
+        this(name, null);
+    }
+
+    public DefaultSubscriber(String name, CountDownLatch latch) {
+        if (name != null)
+            this.name = name + " - ";
+        this.latch = latch;
+    }
+
+    public DefaultSubscriber(CountDownLatch latch) {
+        this(null, latch);
     }
 
     @Override
@@ -34,5 +47,6 @@ public class DefaultSubscriber implements Subscriber<Object> {
     @Override
     public void onComplete() {
         log.debug("{}Completed", name);
+        if (latch != null) latch.countDown();
     }
 }

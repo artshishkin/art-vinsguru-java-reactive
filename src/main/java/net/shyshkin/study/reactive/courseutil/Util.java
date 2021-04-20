@@ -4,6 +4,7 @@ import com.github.javafaker.Faker;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Subscriber;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
 @Slf4j
@@ -29,5 +30,13 @@ public class Util {
 
     public static Subscriber<Object> subscriber(String name) {
         return new DefaultSubscriber(name);
+    }
+
+    public static Subscriber<Object> subscriber(CountDownLatch latch) {
+        return new DefaultSubscriber(latch);
+    }
+
+    public static Subscriber<Object> subscriber(String name, CountDownLatch latch) {
+        return new DefaultSubscriber(name, latch);
     }
 }
