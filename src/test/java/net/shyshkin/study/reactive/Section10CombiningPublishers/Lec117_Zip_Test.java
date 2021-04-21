@@ -47,6 +47,30 @@ public class Lec117_Zip_Test {
         latch.await();
     }
 
+    @Test
+    void zip_tuple_map() throws InterruptedException {
+
+        //given
+        CountDownLatch latch = new CountDownLatch(1);
+
+        //when
+        Flux.zip(getBody(), getEngine(), getTires())
+
+                //then
+                .map(tuple -> tuple
+                        .mapT1(body -> body.toUpperCase() + Util.FAKER.random().nextInt(10, 99))
+                        .mapT2(engine -> engine.toUpperCase() + Util.FAKER.random().nextInt(10, 99))
+                        .mapT3(tires -> tires.toUpperCase() + Util.FAKER.random().nextInt(10, 99))
+                )
+                .doOnNext(tuple -> log.debug("{}:{}:{}",
+                        tuple.getT1(), tuple.getT2(), tuple.getT3()
+                ))
+                .doOnNext(tuple -> tuple.forEach(o -> log.debug("{}:{}", o, o.getClass())))
+                .map(tuple -> tuple.getT1() + "-" + tuple.getT2() + "-" + tuple.getT3())
+                .subscribe(Util.subscriber(latch));
+        latch.await();
+    }
+
     private Flux<String> getBody() {
         return Flux.range(1, 2)
                 .map(i -> "body");
