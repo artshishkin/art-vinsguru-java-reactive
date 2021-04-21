@@ -42,6 +42,7 @@ public class DefaultSubscriber implements Subscriber<Object> {
     @Override
     public void onError(Throwable ex) {
         log.error("{}ERROR: {}:{}", name, ex.getClass().getSimpleName(), ex.getMessage());
+        if (latch != null) latch.countDown();
     }
 
     @Override
