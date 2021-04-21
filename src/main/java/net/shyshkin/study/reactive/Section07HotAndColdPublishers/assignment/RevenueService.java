@@ -1,6 +1,7 @@
 package net.shyshkin.study.reactive.Section07HotAndColdPublishers.assignment;
 
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -20,6 +21,7 @@ public class RevenueService {
 
     public Flux<String> revenueStream() {
         return Flux.interval(Duration.ofSeconds(2))
-                .map(i -> db.toString());
+                .map(i -> db.toString())
+                .subscribeOn(Schedulers.boundedElastic());
     }
 }
