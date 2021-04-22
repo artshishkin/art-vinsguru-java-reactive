@@ -20,7 +20,7 @@ public class Util {
         try {
             Thread.sleep((long) (1000 * seconds));
         } catch (InterruptedException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
     }
 
