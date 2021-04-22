@@ -1,14 +1,17 @@
 package net.shyshkin.study.reactive.Section10CombiningPublishers;
 
+import lombok.extern.slf4j.Slf4j;
 import net.shyshkin.study.reactive.courseutil.Util;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.concurrent.CountDownLatch;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Slf4j
 public class Lec114_StartWith_Test {
 
     @Test
@@ -62,5 +65,24 @@ public class Lec114_StartWith_Test {
                 .filter(n -> n.startsWith("A"))
                 .take(2)
                 .subscribe(Util.subscriber("sub2"));
+    }
+
+    @Test
+    void initialValueFirst() throws InterruptedException {
+        //given
+        CountDownLatch latch = new CountDownLatch(1);
+        log.debug("Start...");
+        Flux<Integer> mainFlux = Flux
+                .range(2, 4)
+                .delayElements(Duration.ofMillis(1000));
+
+        Flux<Integer> immediateFlux = mainFlux.startWith(1);
+
+        //when
+        immediateFlux
+                .subscribe(Util.subscriber(latch));
+
+        //then
+        latch.await();
     }
 }
