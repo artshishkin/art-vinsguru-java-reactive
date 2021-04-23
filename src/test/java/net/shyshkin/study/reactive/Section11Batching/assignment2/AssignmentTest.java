@@ -6,27 +6,31 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Function;
 
 @Slf4j
 class AssignmentTest {
 
-
     private OrderService orderService;
-    private KidsProcessService kidsProcessService;
-    private AutomotiveProcessService automotiveProcessService;
     private CountDownLatch latch;
+
+    private Map<String, Function<Flux<PurchaseOrder>, Flux<PurchaseOrder>>> processors;
 
     @BeforeEach
     void setUp() {
         orderService = new OrderService();
-        kidsProcessService = new KidsProcessService();
-        automotiveProcessService = new AutomotiveProcessService();
+        KidsProcessService kidsProcessService = new KidsProcessService();
+        AutomotiveProcessService automotiveProcessService = new AutomotiveProcessService();
         latch = new CountDownLatch(1);
+        processors = Map.of(
+                "Kids", kidsProcessService.process(),
+                "Automotive", automotiveProcessService.process()
+        );
     }
 
     @AfterEach
@@ -37,7 +41,7 @@ class AssignmentTest {
     @Test
     void process() {
         //given
-        Set<String> availableCategories = Set.of("Kids", "Automotive");
+        Set<String> availableCategories = processors.keySet();
 
         Flux<PurchaseOrder> orderFlux = orderService
                 .getOrders()
@@ -53,10 +57,9 @@ class AssignmentTest {
                 .subscribe(Util.subscriber(latch));
     }
 
-    private Mono<Void> process(Flux<PurchaseOrder> orderFlux, String category) {
+    private Flux<PurchaseOrder> process(Flux<PurchaseOrder> orderFlux, String category) {
         log.debug("process for {} started", category);
-        return "Kids".equals(category) ? kidsProcessService.process(orderFlux) :
-                "Automotive".equals(category) ? automotiveProcessService.process(orderFlux) :
-                        Mono.error(new RuntimeException("Not available category found: " + category));
+        return processors.get(category).apply(orderFlux);
     }
+
 }

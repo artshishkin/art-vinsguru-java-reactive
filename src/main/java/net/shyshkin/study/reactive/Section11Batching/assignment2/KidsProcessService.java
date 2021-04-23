@@ -2,29 +2,34 @@ package net.shyshkin.study.reactive.Section11Batching.assignment2;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 @Slf4j
 public class KidsProcessService implements ProcessService {
 
     @Override
-    public Mono<Void> process(Flux<PurchaseOrder> orderFlux) {
-        return orderFlux
-                .doOnNext(order -> log.debug("received: {}", order))
+    public Function<Flux<PurchaseOrder>, Flux<PurchaseOrder>> process() {
+        return orderFlux -> orderFlux
                 .doOnNext(discount())
-                .doOnNext(oneFreeProduct())
-                .doOnNext(order -> log.debug("packaging: {}", order))
-                .doOnComplete(() -> log.debug("finished process"))
-                .then();
+                .flatMap(addFreeProduct())
+                .doOnComplete(() -> log.debug("finished process"));
     }
 
     private Consumer<PurchaseOrder> discount() {
         return order -> order.setPrice(order.getPrice() * 0.5);
     }
 
-    private Consumer<PurchaseOrder> oneFreeProduct() {
-        return order -> order.setQuantity(order.getQuantity() + 1);
+    private Function<PurchaseOrder, Flux<PurchaseOrder>> addFreeProduct() {
+        return order -> Flux.just(order, freeProductGenerate());
+    }
+
+    private PurchaseOrder freeProductGenerate() {
+        PurchaseOrder freeOrder = new PurchaseOrder();
+        freeOrder.setItem("FREE - " + freeOrder.getItem());
+        freeOrder.setPrice(0d);
+        freeOrder.setQuantity(1);
+        return freeOrder;
     }
 }

@@ -1,9 +1,10 @@
 package net.shyshkin.study.reactive.Section11Batching.assignment2;
 
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
+import java.util.function.Function;
 
 public interface ProcessService {
 
-    Mono<Void> process(Flux<PurchaseOrder> orderFlux);
+    Function<Flux<PurchaseOrder>, Flux<PurchaseOrder>> process();
 }
