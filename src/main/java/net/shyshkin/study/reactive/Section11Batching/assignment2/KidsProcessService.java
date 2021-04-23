@@ -2,6 +2,7 @@ package net.shyshkin.study.reactive.Section11Batching.assignment2;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -22,14 +23,16 @@ public class KidsProcessService implements ProcessService {
     }
 
     private Function<PurchaseOrder, Flux<PurchaseOrder>> addFreeProduct() {
-        return order -> Flux.just(order, freeProductGenerate());
+        return order -> Flux.concat(Mono.just(order), freeProductGenerate());
     }
 
-    private PurchaseOrder freeProductGenerate() {
-        PurchaseOrder freeOrder = new PurchaseOrder();
-        freeOrder.setItem("FREE - " + freeOrder.getItem());
-        freeOrder.setPrice(0d);
-        freeOrder.setQuantity(1);
-        return freeOrder;
+    private Mono<PurchaseOrder> freeProductGenerate() {
+        return Mono.fromSupplier(() -> {
+            PurchaseOrder freeOrder = new PurchaseOrder();
+            freeOrder.setItem("FREE - " + freeOrder.getItem());
+            freeOrder.setPrice(0d);
+            freeOrder.setQuantity(1);
+            return freeOrder;
+        });
     }
 }
