@@ -73,4 +73,22 @@ public class Lec152_SinkMany_Multicast_Test {
         sink.tryEmitComplete();
         log.debug("First subscriber receives all the buffer, second - only after subscription");
     }
+
+    @Test
+    void multicast_disableHistory() {
+        //given
+        Sinks.Many<Object> sink = Sinks.many().multicast().directAllOrNothing();
+
+        //when
+        Flux<Object> flux = sink.asFlux();
+
+        //then
+        IntStream.rangeClosed(1, 3).forEach(sink::tryEmitNext);
+        flux.subscribe(Util.subscriber("art", latch));
+        flux.subscribe(Util.subscriber("kate", latch));
+        IntStream.rangeClosed(4, 5).forEach(sink::tryEmitNext);
+        flux.subscribe(Util.subscriber("arina", latch));
+        sink.tryEmitNext("with `directAllOrNothing` all subscribers receive messages after subscription");
+        sink.tryEmitComplete();
+    }
 }
