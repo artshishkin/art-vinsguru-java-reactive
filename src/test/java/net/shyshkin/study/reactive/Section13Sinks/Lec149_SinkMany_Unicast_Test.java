@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.shyshkin.study.reactive.courseutil.Util;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
@@ -36,6 +37,22 @@ public class Lec149_SinkMany_Unicast_Test {
 
         //then
         flux.subscribe(Util.subscriber("art", latch));
+        IntStream.rangeClosed(1, 5).forEach(sink::tryEmitNext);
+        sink.tryEmitComplete();
+    }
+
+    @Test
+    @DisplayName("Unicast does not allow multiple subscribers")
+    void unicast_multipleSubscribers() {
+        //given
+        Sinks.Many<Object> sink = Sinks.many().unicast().onBackpressureBuffer();
+
+        //when
+        Flux<Object> flux = sink.asFlux();
+
+        //then
+        flux.subscribe(Util.subscriber("art", latch));
+        flux.subscribe(Util.subscriber("kate", latch));
         IntStream.rangeClosed(1, 5).forEach(sink::tryEmitNext);
         sink.tryEmitComplete();
     }
