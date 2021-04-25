@@ -162,4 +162,21 @@ public class Lec145_SinkOne_TryEmitValue_Test {
 
         Util.sleep(2);
     }
+
+    @Test
+    void multipleSubscribers() {
+        //given
+        latch = new CountDownLatch(2);
+        Sinks.One<Object> sink = Sinks.one();
+
+        //when
+        Mono<Object> mono = sink.asMono();
+
+        mono.subscribe(Util.subscriber("Subscriber 1", latch));
+        mono.subscribe(Util.subscriber("Subscriber 2", latch));
+
+        //then
+        Util.sleep(0.1);
+        sink.tryEmitValue("one message");
+    }
 }
