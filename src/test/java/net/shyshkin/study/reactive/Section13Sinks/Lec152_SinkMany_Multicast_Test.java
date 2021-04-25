@@ -54,4 +54,23 @@ public class Lec152_SinkMany_Multicast_Test {
         IntStream.rangeClosed(1, 5).forEach(sink::tryEmitNext);
         sink.tryEmitComplete();
     }
+
+    @Test
+    void multicast_buffer() {
+        //given
+        Sinks.Many<Object> sink = Sinks.many().multicast().onBackpressureBuffer();
+
+        //when
+        Flux<Object> flux = sink.asFlux();
+
+        //then
+        IntStream.rangeClosed(1, 3).forEach(sink::tryEmitNext);
+        flux.subscribe(Util.subscriber("art", latch));
+        flux.subscribe(Util.subscriber("kate", latch));
+        IntStream.rangeClosed(4, 5).forEach(sink::tryEmitNext);
+        flux.subscribe(Util.subscriber("arina", latch));
+        sink.tryEmitNext("second and next subscribers receive messages after subscription");
+        sink.tryEmitComplete();
+        log.debug("First subscriber receives all the buffer, second - only after subscription");
+    }
 }
