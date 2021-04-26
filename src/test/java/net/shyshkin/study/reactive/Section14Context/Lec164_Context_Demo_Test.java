@@ -2,6 +2,7 @@ package net.shyshkin.study.reactive.Section14Context;
 
 import lombok.extern.slf4j.Slf4j;
 import net.shyshkin.study.reactive.courseutil.Util;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
@@ -162,6 +163,36 @@ public class Lec164_Context_Demo_Test {
         }
 
         private Mono<String> getWelcomeMessageWithContextError() {
+            return Mono
+                    .deferContextual(contextView -> Mono.just(
+                            contextView
+                                    .getOrEmpty("user")
+                                    .map(user -> "Welcome " + user)
+                                    .orElseThrow(() -> new RuntimeException("Unauthenticated"))));
+        }
+    }
+
+    @Nested
+    class ContextReplacement {
+
+        @Test
+        @DisplayName("Context replacement from down to up")
+        void contextReplacement() {
+
+            //when
+            Mono<String> mono = getWelcomeMessage()
+                    .contextWrite(Context.of("user", "Kate"))
+                    .contextWrite(Context.of("user", "Art"))
+                    .doOnNext(Util.onNext);
+
+            //then
+            StepVerifier.create(mono)
+                    .expectNext("Welcome Kate")
+                    .verifyComplete();
+        }
+
+
+        private Mono<String> getWelcomeMessage() {
             return Mono
                     .deferContextual(contextView -> Mono.just(
                             contextView
