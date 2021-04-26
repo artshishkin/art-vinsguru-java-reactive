@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 
+import java.util.Objects;
+
 @Slf4j
 public class SlackRoom {
 
@@ -36,6 +38,7 @@ public class SlackRoom {
 
     private void subscribe(SlackMember member) {
         flux
+                .filter(msg -> !Objects.equals(msg.getSender(), member.getName()))
                 .doOnNext(msg -> msg.setReceiver(member.getName()))
                 .map(SlackMessage::toString)
                 .subscribe(member::receives);

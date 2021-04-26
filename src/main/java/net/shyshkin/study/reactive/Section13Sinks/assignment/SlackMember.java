@@ -12,13 +12,13 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public class SlackMember {
 
-    @Getter
+    @Getter(AccessLevel.PACKAGE)
     private final String name;
 
     @Setter(AccessLevel.PACKAGE)
     private Consumer<String> messageConsumer;
 
-    public void says(String message) {
+    void says(String message) {
         messageConsumer.accept(message);
     }
 
