@@ -201,4 +201,33 @@ public class Lec164_Context_Demo_Test {
                                     .orElseThrow(() -> new RuntimeException("Unauthenticated"))));
         }
     }
+
+    @Nested
+    class ContextUpdate {
+
+        @Test
+        @DisplayName("Context update")
+        void update() {
+
+            //when
+            Mono<String> mono = getWelcomeMessage()
+                    .contextWrite(ctx -> ctx.put("user", ((String) ctx.get("user")).toUpperCase()))
+                    .contextWrite(Context.of("user", "Art"))
+                    .doOnNext(Util.onNext);
+
+            //then
+            StepVerifier.create(mono)
+                    .expectNext("Welcome ART")
+                    .verifyComplete();
+        }
+
+        private Mono<String> getWelcomeMessage() {
+            return Mono
+                    .deferContextual(contextView -> Mono.just(
+                            contextView
+                                    .getOrEmpty("user")
+                                    .map(user -> "Welcome " + user)
+                                    .orElseThrow(() -> new RuntimeException("Unauthenticated"))));
+        }
+    }
 }
